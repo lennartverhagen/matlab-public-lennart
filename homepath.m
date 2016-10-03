@@ -9,7 +9,7 @@ function p = homepath
 try
     % try to get the home path from an environment variable
     if ispc,	p = getenv('USERPROFILE');
-    else        p = getenv('HOME');
+    else      p = getenv('HOME');
     end
 catch
     % defunct to using a tilde, which probably won't work on Windows, but

@@ -1,8 +1,10 @@
-function [s] = getsubfield(s, f);
+function sout = getsubfield(s, f)
 
 % GETSUBFIELD returns a field from a structure just like the standard
-% Matlab GETFIELD function, except that you can also specify nested fields
-% using a '.' in the fieldname. The nesting can be arbitrary deep.
+% GETFIELD function, except that you can also specify nested fields
+% using a '.' in the fieldname. The nesting can be arbitrary deep. If the
+% structure is multidimensional it will return the result in a cell
+% array.
 %
 % Use as
 %   f = getsubfield(s, 'fieldname')
@@ -11,10 +13,11 @@ function [s] = getsubfield(s, f);
 %
 % See also GETFIELD, ISSUBFIELD, SETSUBFIELD
 
-% Copyright (C) 2005, Robert Oostenveld
+% Copyright (C) 2016, Lennart Verhagen
+% Copyright (C) 2005-2013, Robert Oostenveld
 %
-% This file is part of FieldTrip, see http://www.ru.nl/neuroimaging/fieldtrip
-% for the documentation and details.
+% This file is based on a file that was part of FieldTrip, see
+% http://www.fieldtriptoolbox.org for the documentation and details.
 %
 %    FieldTrip is free software: you can redistribute it and/or modify
 %    it under the terms of the GNU General Public License as published by
@@ -29,17 +32,38 @@ function [s] = getsubfield(s, f);
 %    You should have received a copy of the GNU General Public License
 %    along with FieldTrip. If not, see <http://www.gnu.org/licenses/>.
 %
-% $Id: getsubfield.m 951 2010-04-21 18:24:01Z roboos $
+% $Id$
 
-if ~isstr(f)
+if nargin < 2
+  f = '';
+end
+
+if iscell(f)
+  f = f{1};
+end
+
+if ~ischar(f)
   error('incorrect input argument for fieldname');
 end
 
-t = {};
-while (1)
-  [t{end+1}, f] = strtok(f, '.');
-  if isempty(f)
-    break
+if ~iscell(s)
+  s = {s};
+end
+
+if isempty(f)
+  sout = s;
+  return
+end
+
+f = regexp(f,'\.','split');
+sout = cell(size(s));
+for c = 1:numel(s)
+  sout{c} = getsubfield({s{c}.(f{1})},f{2:end});
+  while iscell(sout{c}) && numel(sout{c}) == 1
+    sout{c} = sout{c}{:};
   end
 end
-s = getfield(s, t{:});
+
+while iscell(sout) && numel(sout) == 1
+  sout = sout{:};
+end
