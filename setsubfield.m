@@ -1,15 +1,19 @@
-function s = getsubfield(s, f)
+function s = setsubfield(s, f, v)
 
-% GETSUBFIELD returns a field from a structure just like the standard
-% GETFIELD function, except that you can also specify nested fields
-% using a '.' in the fieldname. The nesting can be arbitrary deep.
+% SETSUBFIELD sets the contents of the specified field to a specified value
+% just like the standard Matlab SETFIELD function, except that you can also
+% specify nested fields using a '.' in the fieldname. The nesting can be
+% arbitrary deep.
 %
 % Use as
-%   f = getsubfield(s, 'fieldname')
+%   s = setsubfield(s, 'fieldname', value)
 % or as
-%   f = getsubfield(s, 'fieldname.subfieldname')
+%   s = setsubfield(s, 'fieldname.subfieldname', value)
 %
-% See also GETFIELD, ISSUBFIELD, SETSUBFIELD
+% where nested is a logical, false denoting that setsubfield will create
+% s.subfieldname instead of s.fieldname.subfieldname
+%
+% See also SETFIELD, GETSUBFIELD, ISSUBFIELD
 
 % Copyright (C) 2005-2013, Robert Oostenveld
 %
@@ -31,16 +35,20 @@ function s = getsubfield(s, f)
 %
 % $Id$
 
-if iscell(f)
-  f = f{1};
-end
-
 if ~ischar(f)
   error('incorrect input argument for fieldname');
 end
 
+% t = {};
+% while (1)
+%   [t{end+1}, f] = strtok(f, '.');
+%   if isempty(f)
+%     break
+%   end
+%
+% end
+%
+%s = setfield(s, t{:}, v);
+
 t = textscan(f,'%s','delimiter','.');
-t = t{1};
-for k = 1:numel(t)
-  s = s.(t{k});
-end
+s = setfield(s, t{1}{:}, v);

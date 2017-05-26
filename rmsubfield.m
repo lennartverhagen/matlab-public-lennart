@@ -1,17 +1,18 @@
-function s = getsubfield(s, f)
+function s = rmsubfield(s, f, v)
 
-% GETSUBFIELD returns a field from a structure just like the standard
-% GETFIELD function, except that you can also specify nested fields
-% using a '.' in the fieldname. The nesting can be arbitrary deep.
+% RMSUBFIELD removes the contents of the specified field from a structure
+% just like the standard Matlab RMFIELD function, except that you can also
+% specify nested fields using a '.' in the fieldname. The nesting can be
+% arbitrary deep.
 %
 % Use as
-%   f = getsubfield(s, 'fieldname')
+%   s = rmsubfield(s, 'fieldname')
 % or as
-%   f = getsubfield(s, 'fieldname.subfieldname')
+%   s = rmsubfield(s, 'fieldname.subfieldname')
 %
-% See also GETFIELD, ISSUBFIELD, SETSUBFIELD
+% See also SETFIELD, GETSUBFIELD, ISSUBFIELD
 
-% Copyright (C) 2005-2013, Robert Oostenveld
+% Copyright (C) 2006-2013, Robert Oostenveld
 %
 % This file is part of FieldTrip, see http://www.fieldtriptoolbox.org
 % for the documentation and details.
@@ -31,16 +32,15 @@ function s = getsubfield(s, f)
 %
 % $Id$
 
-if iscell(f)
-  f = f{1};
-end
-
 if ~ischar(f)
   error('incorrect input argument for fieldname');
 end
 
-t = textscan(f,'%s','delimiter','.');
-t = t{1};
-for k = 1:numel(t)
-  s = s.(t{k});
+% remove the nested subfield using recursion
+[t, f] = strtok(f, '.');
+if any(f=='.')
+  u = rmsubfield(getfield(s, t), f);
+  s = setfield(s, t, u);
+else
+  s = rmfield(s, t);
 end
