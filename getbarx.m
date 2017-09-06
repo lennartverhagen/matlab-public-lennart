@@ -38,6 +38,9 @@ if ishandle(varargin{1})
         
     end
     
+    % ensure X is horizontal if a single dataset is provided
+    if numel(X) == length(X), X = X(:)'; end
+    
     % done!
     return
     
@@ -61,4 +64,4 @@ nbar = size(Y,2);
 groupwidth = step*min(0.8, nbar/(nbar+1.5));
 A = X - groupwidth/2;
 B = (2*(1:nbar)-1) * groupwidth / (2*nbar);
-X = repmat(A,1,nbar) + repmat(B,ngroup,1);                        
+X = repmat(A,1,nbar) + repmat(B,ngroup,1);
