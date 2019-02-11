@@ -42,5 +42,13 @@ end
 t = textscan(f,'%s','delimiter','.');
 t = t{1};
 for k = 1:numel(t)
-  s = s.(t{k});
+  if numel(s) < 2
+    s = s.(t{k});
+  else
+    if k < numel(t)
+      s = [s.(t{k})];
+    else
+      s = {s.(t{k})};
+    end
+  end
 end
